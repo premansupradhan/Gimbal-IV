@@ -1,0 +1,572 @@
+Premansu Pradhan
+premansupradhan
+final code
+Premansu Pradhan — 19/08/2023 17:51
+Premansu Pradhan — 19/08/2023 18:25
+Prathamesh L — 19/08/2023 18:53
+Image
+Kishore — 20/08/2023 12:28
+Time slot for today is from 5 to 8
+Manthan Gala — 20/08/2023 17:11
+I'll be there by 6
+Premansu Pradhan — 20/08/2023 18:25
+Premansu Pradhan — 20/08/2023 18:54
+rotating servo motors with varying speeds which depends upon the angle the mpu has been tilted
+Pratyush Chakraborty — 20/08/2023 20:15
+Great 👍🏻
+Kishore — 21/08/2023 11:56
+Time slot for today from 7 to 8:30pm
+Manthan Gala — 21/08/2023 12:14
+Image
+For 3 dof
+Prathamesh L — 21/08/2023 12:29
+Yehi same cheez haii
+Prathamesh L — 21/08/2023 19:11
+Me and @Manthan Gala are stuck here at mac for that aarohi podcast
+Let's postpone the meet to tomorrow if possible
+Premansu Pradhan — 21/08/2023 20:40
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
+#include <Servo.h>
+Adafruit_MPU6050 mpu;
+Servo sx;
+Expand
+Almost_final_code.txt
+3 KB
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
+#include <Servo.h>
+Adafruit_MPU6050 mpu;
+Servo sx;
+Expand
+Motor_test.txt
+1 KB
+Manthan Gala — 22/08/2023 16:48
+When is the lab available today?
+Manthan Gala — 22/08/2023 16:56
+@Kishore @Pratyush Chakraborty
+Pratyush Chakraborty — 22/08/2023 16:57
+Don't come today since the lab is occupied with other meeting going on
+You can come tomorrow most probably
+Manthan Gala — 22/08/2023 16:58
+👍🏻👍🏻
+Malhar — 22/08/2023 17:25
+meeting hogayi, you guys can come to lab
+Pratyush Chakraborty — 22/08/2023 17:31
+@Kishore kitne baje jaara aaj lab
+Kishore — 22/08/2023 17:39
+7:00 pm
+Kishore — 22/08/2023 18:46
+@Gimbal Meet not possible today. 
+Kishore — 23/08/2023 15:48
+I don't think a meet will be possible today either as there are a couple of meets already scheduled.
+Kishore — 23/08/2023 16:09
+Those who are free now can go from 4:30 to 6:00
+Mayank Lonkar — 23/08/2023 16:20
+@Gimbal
+Aiden D'souza — 24/08/2023 08:33
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
+#include <Servo.h>
+Adafruit_MPU6050 mpu;
+Servo sx;
+Expand
+Final.txt
+3 KB
+Premansu Pradhan — 24/08/2023 22:32
+😭👍
+Prathamesh L — 24/08/2023 22:34
+Lesssgooooo
+Pratyush Chakraborty — 25/08/2023 00:41
+Let's meet tomorrow then
+@Gimbal
+Sab shamko free ho na ??
+Premansu Pradhan — 25/08/2023 06:20
+after 6👍
+Manthan Gala — 25/08/2023 06:52
+Sir Ghar Jaa Raha hun
+8:40 ki train hai, agar jaldi mil sakte hain, toh it works
+Aiden D'souza — 25/08/2023 07:49
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
+#include <Servo.h>
+Adafruit_MPU6050 mpu;
+Servo sx;
+Servo sy;
+Servo sz;
+
+float w_x = 0, w_y = 0, w_z = 0; //angular velocity
+float w_x_c = -0.22; //angular velocity x-direction calibration
+float w_y_c = 1.76; //angular velocity y-direction calibration
+float w_z_c = -3.47;
+float r_x = 90, r_y = 90, r_z = 90; //angle rotated as detected by IMU
+float w_x_p = 0, w_y_p = 0, w_z_p = 0;
+float a_x = 0, a_y = 0, a_z = 0;
+
+float kp = 10;
+float kd = 1;
+float ex,ey,ez;
+float epx = 0, epy = 0, epz = 0;
+int delay_time=50;
+float anglex,angley,anglexp,anglexp2,angleyp,angleyp2,anglez,anglezp,anglezp2;
+float ux,uy,uz;
+void setup() {
+  Serial.begin(9600);
+  while (!Serial)
+    delay(10); // will pause Zero, Leonardo, etc until serial console opens
+
+  // Try to initialize!
+  if (!mpu.begin()) {
+    while (1) {
+      delay(10);
+    }
+  }
+  sx.attach(10);
+  sy.attach(7);
+  sz.attach(9);
+
+}
+
+void loop() {
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  w_x = g.gyro.x * (180/3.14);
+  w_y = g.gyro.y * (180/3.14);
+  w_z = g.gyro.z * (180/3.14);
+
+  w_x -= w_x_c;
+  w_y -= w_y_c;
+  w_z -= w_z_c;
+
+  a_x = (w_x - w_x_p)/delay_time;
+  a_y = (w_y - w_y_p)/delay_time;
+
+  r_x += (w_x * delay_time * 0.001) + (0.5*a_x*(delay_time * 0.001)*(delay_time * 0.001));
+  r_y += (w_y * delay_time * 0.001) + (0.5*a_y*(delay_time * 0.001)*(delay_time * 0.001));
+  r_z += (w_z * delay_time * 0.001) + (0.5*a_z*(delay_time * 0.001)*(delay_time * 0.001));
+
+  ex = r_x;
+  ey = r_y;
+  ez = r_z;
+  ux = kp*ex +kd*(ex-epx);
+  uy = kp*ey +kd*(ey-epy);
+  uz = kp*ez +kd*(ez-epz);
+ anglex =  map(ux,100,1700,180,0);
+ angley =  map(uy,-50,1800,70,110);
+ anglez =  map(uz,50,1700,180,00);
+  //Serial.print(ux);
+  //Serial.print(",");
+  if((anglexp2>=anglexp-0.1 && anglexp2<=anglexp+0.1)&&(anglexp>=anglex-0.1 && anglexp<=anglex+0.1)){
+    anglex = 90;
+  }
+  if((angleyp2>=angleyp-0.1 && angleyp2<=angleyp+0.1)&&(angleyp>=angley-0.1 && angleyp<=angley+0.1)){
+    angley = 90;
+  }
+  if(anglex>=85 && anglex<88){
+    sx.write(85);
+  }
+  else if(anglex>=88 && anglex<=92){
+    sx.write(90);
+  }
+  else if(anglex>92 && anglex<=97){
+    sx.write(97);
+  }
+  else {
+    sx.write(anglex);
+  }
+  if(angley>=85 && angley<89){
+    sy.write(85);
+  }
+  else if(angley>=89 && angley<=92){
+    sy.write(90);
+  }
+  else if(angley>92 && angley<=97){
+    sy.write(97);
+  }
+  else {
+    sy.write(angley);
+... (54 lines left)
+Collapse
+Final_code.txt
+4 KB
+Undone documentation
+Attachment file type: document
+Documentation.docx
+15.94 KB
+Pratyush Chakraborty — 25/08/2023 15:20
+i am available till 7
+uske pehle aajao
+jinka lab nhi hai 5 yah 5:30 tak aajao
+jinka lab hai lab khatam karke aao
+@Gimbal
+Premansu Pradhan — 28/08/2023 11:51
+any updates regarding the third motor?
+Premansu Pradhan — 28/08/2023 23:22
+Camera Feed:
+https://drive.google.com/file/d/1eCSMkGmRqEkZt7EOTakyQfqix3sIhWvN/view?usp=sharing
+Aiden D'souza — 29/08/2023 00:25
+Today camera stabilization tested... esp to old Bluetooth app tested... esp to imu tested... all of the above are now working fine... new chasis also fixed 
+Aiden D'souza — 30/08/2023 00:51
+Camera feed and real time gimbal movement
+https://drive.google.com/drive/folders/1jnz2SVMxnR7BmBndzf1TUogg6e5IwyT8 
+Pratyush Chakraborty — 30/08/2023 16:50
+Will inform you
+Pratyush Chakraborty — 30/08/2023 16:52
+Great work by any means are you able to increase the stability ??
+Aiden D'souza — 30/08/2023 18:23
+The camera that is sometimes seen shaking is bcoz the hands moving the gimbal can't handle its weight to move it smoothly and were shaking while turning the gimbal.... 
+Regarding the motor turning with small pauses... that issue hasn't been resolved yet.
+Kishore — 31/08/2023 23:26
+@Gimbal Meet tomorrow at 6:00pm, need to dicuss about the next stage of the project.
+Pratyush Chakraborty — 01/09/2023 16:47
+I will be there by 6:30
+Prathamesh L — 01/09/2023 17:51
+I won't be able to join in fir today's meet
+Kishore — 01/09/2023 19:22
+Attachment file type: unknown
+MG995.SLDPRT
+932.31 KB
+Kishore — 01/09/2023 19:31
+https://play.google.com/store/apps/details?id=com.invokcontroller.app
+Controller - ESP32 & ESP8266 - Apps on Google Play
+Mobile controller for your ESP8266 & ESP32 project.
+Controller - ESP32 & ESP8266 - Apps on Google Play
+Kishore — 01/09/2023 20:08
+https://ianovir.com/works/mobile/hyperimu/hyperimu-help/
+ianovir
+HyperIMU Documentation
+Overview Technology Designed to be as customizable as possible, HyperIMU streams the sequence of all collected sensors’ values allowing both an online and offline data processing.Main feature…
+HyperIMU Documentation
+Premansu Pradhan — 04/09/2023 12:56
+is there anyone in the lab right now?
+Premansu Pradhan — 04/09/2023 16:19
+i need to take some measurements.
+when can i come to the lab today?
+@Kishore @Pratyush Chakraborty
+Pratyush Chakraborty — 04/09/2023 16:25
+You can come now
+Premansu Pradhan — 04/09/2023 17:26
+https://grabcad.com/
+GrabCAD Making Additive Manufacturing at Scale Possible
+The GrabCAD platform drives additive manufacturing at scale through connected solutions, including GrabCAD Print, GrabCAD Shop & the GrabCAD SDKs.
+Premansu Pradhan — 07/09/2023 18:40
+https://www.amazon.in/GADGETSWRAP-Mount-Mobile-Holder-Smartphone/dp/B09M89WS8M/ref=sr_1_18?keywords=car+mobile+holder&qid=1694092013&refinements=p_36%3A-20000&rnid=1318502031&sr=8-18
+GADGETS WRAP Car Mount Mobile Holder for Smartphone Mobile - Black
+GADGETS WRAP Car Mount Mobile Holder for Smartphone Mobile - Black
+Image
+does anyone know someone who has this kind of holder for smartphone
+https://www.amazon.in/Mounting-Compatible-Smartphones-Videographers-Photographers/dp/B0BY2N4L8V/ref=sr_1_11_sspa?keywords=car+mobile+holder&qid=1694092013&refinements=p_36%3A-20000&rnid=1318502031&sr=8-11-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9tdGY&psc=1
+Amazon Basics Mobile Holder Clip for Tripods with 1/4-inch Mounting...
+Introducing the Amazon Basics Mobile Holder, the ideal accessory for photographers and videographers. Made with high-quality plastic materials the product is durable and long-lasting. It fits any tripod with a 1/4-inch mounting screw making it super convenient to use. It is compatible with most s...
+Image
+Premansu Pradhan — 07/09/2023 18:42
+this appears ideal
+ab baat yahi hai ki 200 rs kon dega:sad_cat:
+Manthan Gala — 07/09/2023 20:21
+🌝🌝🙃🙃
+Manthan Gala — 07/09/2023 20:21
+Yeh attach kaise karte hain??
+Premansu Pradhan — 07/09/2023 20:25
+wo soch lenge
+Pratyush Chakraborty — 08/09/2023 17:18
+Aise paisa kharcha karoge toh isro mein chance nhi milega bhai 🙂
+Kishore — 08/09/2023 22:20
+#include "BluetoothSerial.h"
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run make menuconfig to and enable it
+#endif
+BluetoothSerial SerialBT;
+void setup() {
+  Serial.begin(115200);
+   SerialBT.begin("gyro_bt"); //Bluetooth device name 
+   }
+void loop() {
+if (SerialBT.available()){
+     String k = (SerialBT.readStringUntil('e'));
+     Serial.println(k);}
+ 
+  }
+Attachment file type: unknown
+Gyro_Esp.apk
+3.40 MB
+Above is the apk file and esp32 code to get the readings of the imu from mobile phone and send it to esp32 via bluetooth
+once you connect esp32 from  the app the readings of the gyro will be sent to esp via serial in this format.
+Image
+Kishore — 13/09/2023 18:56
+isko kisi aur ne chalake dekha kya? 
+Are the bluetooth devices visible within the app? 
+Aiden D'souza — 14/09/2023 18:51
+Checked from another guy's phone... the nearby Bluetooth devices won't pop up in the app 
+Pratyush Chakraborty — 01/10/2023 22:07
+Hello guys 🙂🙂
+@Gimbal sab jinda ho na midsems ke baad ?? 
+Manthan Gala — 02/10/2023 13:12
+Resurrection chal raha hai
+Pratyush Chakraborty — 02/10/2023 18:36
+Good
+Toh sab agar yeh 3 din ghum vhum liye ho toh abhi thoda vapas kaam pe aa jao
+Github aur uska Readme and documentation ka Kitna progress hua hai
+Ek ppt bhi banana like kinda documentation
+Uska record karke video banana hai
+Iske liye ek meet lete hai
+@Gimbal Kal meet ??
+Prathamesh L — 02/10/2023 19:07
+documentation itta hua hai abtak
+Attachment file type: document
+Documentation.docx
+49.07 KB
+photos videos bache hai
+and codes conclustion bhi
+project overview bhi bharne ke liye kuch socho 
+Mayank Lonkar — 02/10/2023 20:07
+Google docs use Karo bhai .. comment Kar sakte hai easily
+Pratyush Chakraborty — 03/10/2023 15:57
+Aaj thoda busy hu timing batata hu
+Asmit Panigrahi — 03/10/2023 19:41
+will there be a meet today?
+Pratyush Chakraborty — 03/10/2023 20:30
+No
+Github ka Kitna hua hai
+Dekho Readme likhna hai
+Jo sabka common hoga
+Jisme tum sabke likhe hua codes jo individual hoge
+Bus Readme common hoga
+Documentation banao jo ki tumhare reference ke liye hoga usme mom type cheeze nhi likhna hai
+It should be like a guiding document for you if you work on a project related to this work
+Baaki doubts hoge toh meet leke discuss kar sakte hai
+Mostly online hoga yeh week meko Kyoki mere thode matches vagera hai yeh week mein
+@Gimbal
+Pratyush Chakraborty — 03/10/2023 20:37
+Next ppt banana hai jisme tumhare results hoge
+And process mein concepts learned vagera short mein likhna hai
+Then usi ppt ko slideshow ke format mein records karna hai
+And ek video banana hai
+Do it asap
+If you want something for  reference I will provide the required resources
+‼️But do this asap‼️ 
+Pratyush Chakraborty — 03/10/2023 20:53
+I want the work to be completed by friday
+You have all the required data and results and information to complete this work
+So do it asap
+Because we need 1 day time to review and do the required changes
+So do it till Friday as you are free now
+If you have any doubt or need some material reference ask over here or we can have a meeting if time permits
+But do it asap
+Make the ppt in Google slides
+Pratyush Chakraborty — 03/10/2023 21:01
+Github sabko individual banana hai but Readme common hoga bus
+Aiden D'souza — 04/10/2023 01:30
+https://docs.google.com/presentation/d/1reesFiiwR339ZywCxZnMrMuNBKJnN7RFB1rY1NBfhnA/edit?usp=sharing Extremely basic form of PPT (to be built on)... Please share  your email ids so that I can give editor access... Prathamesh please share your matplotlib plotting results so that I can add that to the results
+Google Docs
+Gimbal
+2 DOF Gimbal Summer Internship 2023, IV labs
+Image
+Pratyush Chakraborty — 04/10/2023 21:28
+https://youtu.be/9oNm4_b-rRE?si=gj_2N1JszYjqHXMK
+YouTube
+IvLabs
+Shape Tracing with Robotic Arm
+Image
+Refer this video
+You can refer this video for ppt and video
+I want everyone's individual github repo to be shared over here
+Prathamesh L — 05/10/2023 19:09
+the results are the same one shared above 
+no luck in simultaneous plotting
+i tried addidng that video to the ppt says file type not supported
+you try once too
+Prathamesh L — 05/10/2023 19:11
+.
+Manthan Gala — 05/10/2023 19:19
+Sameee
+Pratyush Chakraborty — 05/10/2023 21:39
+Try to do it in gif format if possible
+Video ko fast forward karo aur gif banao if video add nbi hora
+Ppt ko format ko symmetrical rakho
+Jo step 1 and step 2 ke pics add kiye ho voh aur text symmetrical nhi lagra
+Asmit Panigrahi — 06/10/2023 13:44
+Is it possible for me to come to lab today to test gimbal?
+Aiden D'souza — 06/10/2023 13:55
+I was able to add the video to the PPT... but the problem with the video is that the angles can't be read clearly
+Pratyush Chakraborty — 06/10/2023 23:06
+The angles need not be visible
+The motion and simulation is enough to tell that it being replicated 
+Pratyush Chakraborty — Yesterday at 15:25
+Ppt Kab complete karoge ??
+1 hafte se jyada ho gaya bhai
+@Gimbal
+Manthan Gala — Yesterday at 17:08
+Sir aaj khatam ho jaayega, 2-3 hi slides baaki hain
+Premansu Pradhan — Yesterday at 23:40
+Attachment file type: unknown
+Assembly_v5.f3z
+2.36 MB
+Pratyush Chakraborty — Today at 06:21
+Hai hi toh 4-5 slides bhai :smileforthecamera: 
+Manthan Gala — Today at 17:03
+.
+yeh file gif nahi convert ho rahi, kisike laptop se isko 50mb se kam ka gif karke upload karo na google slides pe
+Mayank Lonkar — Today at 17:05
+link daal de drive ki
+﻿
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
+#include <Servo.h>
+Adafruit_MPU6050 mpu;
+Servo sx;
+Servo sy;
+Servo sz;
+
+float w_x = 0, w_y = 0, w_z = 0; //angular velocity
+float w_x_c = -0.22; //angular velocity x-direction calibration
+float w_y_c = 1.76; //angular velocity y-direction calibration
+float w_z_c = -3.47;
+float r_x = 90, r_y = 90, r_z = 90; //angle rotated as detected by IMU
+float w_x_p = 0, w_y_p = 0, w_z_p = 0;
+float a_x = 0, a_y = 0, a_z = 0;
+
+float kp = 10;
+float kd = 1;
+float ex,ey,ez;
+float epx = 0, epy = 0, epz = 0;
+int delay_time=50;
+float anglex,angley,anglexp,anglexp2,angleyp,angleyp2,anglez,anglezp,anglezp2;
+float ux,uy,uz;
+void setup() {
+  Serial.begin(9600);
+  while (!Serial)
+    delay(10); // will pause Zero, Leonardo, etc until serial console opens
+
+  // Try to initialize!
+  if (!mpu.begin()) {
+    while (1) {
+      delay(10);
+    }
+  }
+  sx.attach(10);
+  sy.attach(7);
+  sz.attach(9);
+
+}
+
+void loop() {
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  w_x = g.gyro.x * (180/3.14);
+  w_y = g.gyro.y * (180/3.14);
+  w_z = g.gyro.z * (180/3.14);
+
+  w_x -= w_x_c;
+  w_y -= w_y_c;
+  w_z -= w_z_c;
+
+  a_x = (w_x - w_x_p)/delay_time;
+  a_y = (w_y - w_y_p)/delay_time;
+
+  r_x += (w_x * delay_time * 0.001) + (0.5*a_x*(delay_time * 0.001)*(delay_time * 0.001));
+  r_y += (w_y * delay_time * 0.001) + (0.5*a_y*(delay_time * 0.001)*(delay_time * 0.001));
+  r_z += (w_z * delay_time * 0.001) + (0.5*a_z*(delay_time * 0.001)*(delay_time * 0.001));
+
+  ex = r_x;
+  ey = r_y;
+  ez = r_z;
+  ux = kp*ex +kd*(ex-epx);
+  uy = kp*ey +kd*(ey-epy);
+  uz = kp*ez +kd*(ez-epz);
+ anglex =  map(ux,100,1700,180,0);
+ angley =  map(uy,-50,1800,70,110);
+ anglez =  map(uz,50,1700,180,00);
+  //Serial.print(ux);
+  //Serial.print(",");
+  if((anglexp2>=anglexp-0.1 && anglexp2<=anglexp+0.1)&&(anglexp>=anglex-0.1 && anglexp<=anglex+0.1)){
+    anglex = 90;
+  }
+  if((angleyp2>=angleyp-0.1 && angleyp2<=angleyp+0.1)&&(angleyp>=angley-0.1 && angleyp<=angley+0.1)){
+    angley = 90;
+  }
+  if(anglex>=85 && anglex<88){
+    sx.write(85);
+  }
+  else if(anglex>=88 && anglex<=92){
+    sx.write(90);
+  }
+  else if(anglex>92 && anglex<=97){
+    sx.write(97);
+  }
+  else {
+    sx.write(anglex);
+  }
+  if(angley>=85 && angley<89){
+    sy.write(85);
+  }
+  else if(angley>=89 && angley<=92){
+    sy.write(90);
+  }
+  else if(angley>92 && angley<=97){
+    sy.write(97);
+  }
+  else {
+    sy.write(angley);
+  }
+  if(anglez>=85 && anglez<89){
+    sz.write(85);
+  }
+  else if(anglez>=89 && anglez<=92){
+    sz.write(90);
+  }
+  else if(anglez>92 && anglez<=97){
+    sz.write(97);
+  }
+  else {
+    sz.write(anglez);
+  }
+
+  Serial.print(r_x);
+  //Serial.print(',  ');
+  //Serial.print(r_y);
+  Serial.print(',');
+  Serial.println(r_z);
+  //Serial.print('  ');
+  //Serial.print(anglex);
+  //Serial.print(',  ');
+  //Serial.print(angley);
+  //Serial.print('  ');
+  //Serial.println(anglez);
+
+  
+
+ // if (r_x -90 > 0) 
+ //   {sx.write(120);}
+
+
+ // else if(r_x-90<0)
+//    {sx.write(60);}
+//if (r_y -90 > 0) 
+ // {sy.write(120);}
+
+
+//else if (r_y-90<0)
+ // {sy.write(60);}
+  epx=ex;
+  epy=ey;
+  epz=ez;
+  w_x_p = w_x;
+  w_y_p = w_y;
+  w_z_p = w_z;
+  anglexp2=anglexp;
+  anglexp = anglex;
+  angleyp2=angleyp;
+  angleyp = angley;
+  anglezp2=anglezp;
+  anglezp = anglez;
+  delay(delay_time);
+}
+Final_code.txt
+4 KB
